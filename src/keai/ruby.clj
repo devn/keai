@@ -46,27 +46,6 @@
   ([obj method ret] (. container callMethod obj method ret))
   ([obj method arg ret] (. container callMethod obj method arg ret)))
 
-
-;; Convert org.jruby.RubyObjects to Clojure
-(defmulti to-clj class)
-
-(defmethod to-clj :default [obj] obj)
-
-(defmethod to-clj org.jruby.RubyString [obj] (str obj))
-
-(defmethod to-clj org.jruby.RubyArray [obj]
-  (mapv to-clj (vec (.toJavaArray obj))))
-
-(defmethod to-clj org.jruby.RubyFixnum [obj]
-  (.getLongValue obj))
-
-(defmethod to-clj org.jruby.RubySymbol [obj]
-  (keyword (str obj)))
-
-(defmethod to-clj org.jruby.RubyHash [obj]
-  (zipmap (mapv to-clj (.keys obj))
-          (mapv to-clj (.values obj))))
-
 (defprotocol Coercable
   "Coerce Ruby objects to Clojure types"
   (clj [this] "Coerce a Ruby object to its Clojure representation"))
