@@ -67,8 +67,36 @@
   (zipmap (mapv to-clj (.keys obj))
           (mapv to-clj (.values obj))))
 
+(defprotocol Coercable
+  "Coerce Ruby objects to Clojure types"
+  (clj [this] "Coerce a Ruby object to its Clojure representation"))
+
+(extend-protocol Coercable
+  org.jruby.RubyString
+  (clj [this] (str this))
+
+  java.lang.Long
+  (clj [this] this)
+
+  java.lang.String
+  (clj [this] this)
+
+  org.jruby.RubyFixnum
+  (clj [this] (.getLongValue this))
+
+  org.jruby.RubyArray
+  (clj [this] (mapv clj (vec (.toJavaArray this))))
+
+  org.jruby.RubySymbol
+  (clj [this] (keyword (str this)))
+
+  org.jruby.RubyHash
+  (clj [this] (zipmap (mapv clj (.keys this))
+                      (mapv clj (.values this)))))
+
 (comment
-  (to-clj (_eval "{a: 1}"))
-  (to-clj (_eval "{:a => 1, :b => 'c', :x => [1,2,3]}"))
+  (clj (_eval "{a: 1}"))
+  ;; => {:a 1}
+  (clj (_eval "{:a => 1, :b => 'c', :x => [1,2,3]}"))
   ;; => {:x [1 2 3], :b "c", :a 1}
 )
