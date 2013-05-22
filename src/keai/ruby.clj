@@ -7,8 +7,8 @@
   (. c setCompatVersion
      (. CompatVersion RUBY1_9)))
 
-(defonce container
-  (let [container (ScriptingContainer. LocalContextScope/CONCURRENT)]
+(def container
+  (let [container (ScriptingContainer. LocalContextScope/SINGLETHREAD)]
     (set-container-version! container)
     container))
 
